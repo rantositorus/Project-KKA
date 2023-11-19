@@ -1,6 +1,6 @@
-from map import map
+from map import Map
 
-class state:
+class State:
     def __init__(self, person: tuple, treasure=[]) -> None:
         self.person = person
         self.treasure = treasure
