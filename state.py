@@ -1,50 +1,67 @@
 from map import Map
 
+
 class State:
-    def __init__(self, person: tuple) -> None:
+    def __init__(self, person: tuple, butters=[]):
         self.person = person
-        # self.lever = lever
+        self.butters = butters
 
     def __eq__(self, other):
-        return self.person == other.person
-    
+        return self.butters == other.butters and self.person == other.person
+
     def __str__(self):
-        return '"Person at: ' + str(self.person)
-    
+        return (
+            '"person at: '
+            + str(self.person)
+            + " Butters at: "
+            + str(self.butters)
+            + '"'
+        )
+
     def __repr__(self):
         return self.__str__()
-    
+
     def __hash__(self):
         h = hash(self.person)
-        # for i in self.lever:
-        #     h += hash(i)
+        for i in self.butters:
+            h += hash(i)
         return h
-    
+
     @staticmethod
-    def successor(state: 'State', map_object: Map) -> list[tuple['State', tuple, int]]:
+    def successor(state: "State", map_object: Map) -> list[tuple["State", tuple, int]]:
         map_array = map_object.map
         points = map_object.points
-        # levers = map_object.levers
-        mech_walls = map_object.mech_walls
         w, h = map_object.w, map_object.h
         next_states = []
         person_y, person_x = state.person[0], state.person[1]
 
         def try_move_person(y: int, x: int):
-            if x*y != 0:
-                raise Exception("Bergerak secara diagonal tidak diizinkan!")
-            
+            """Tries to move person and saves new state in next_states array."""
+
+            # Checking diagonal movement
+            if x * y != 0:
+                raise Exception("Diagonal moving is not allowed.")
+
+            # Checking bounds
             if map_object.check_out_of_bounds(person_y + y, person_x + x):
                 return
-            
+
+            # Checking blocks
             if map_object.is_block(person_y + y, person_x + x):
                 return
-            
-            next_states.append((
-                State((person_y + y, person_x + x)),
-                (y,x),
-                max(int(map_object.map[person_y + y][person_x + x]), int(map_object.map[person_y][person_x]))
-            ))
+
+            # There is no butters around
+            next_states.append(
+                (
+                    State((person_y + y, person_x + x)),
+                    (y, x),
+                    max(
+                        int(map_array[person_y + y][person_x + x]),
+                        int(map_array[person_y][person_x]),
+                    ),
+                )
+            )
+
         try_move_person(1, 0)
         try_move_person(0, 1)
         try_move_person(-1, 0)
@@ -53,35 +70,5 @@ class State:
         return next_states
 
     @staticmethod
-    def predecessor(state: 'State', map_object: Map) -> list[tuple['State', tuple, int]]:
-        next_states = []
-        person_y, person_x = state.person[0], state.person[1]
-
-        def try_move_person(y: int, x: int):
-            if x*y != 0:
-                raise Exception("Bergerak secara diagonal tidak diizinkan!")
-            
-            if map_object.check_out_of_bounds(person_y + y, person_x + x):
-                return
-            
-            if map_object.is_block(person_y + y, person_x + x):
-                return
-            
-            next_states.append((
-                State((person_y + y, person_x + x)),
-                (y,x),
-                max(int(map_object.map[person_y + y][person_x + x]), int(map_object.map[person_y][person_x]))
-            ))
-        try_move_person(1, 0)
-        try_move_person(0, 1)
-        try_move_person(-1, 0)
-        try_move_person(0, -1)
-
-        return next_states
-
-    @staticmethod
-    def is_goal(state: 'State', points: list[tuple]):
-        for person in state.person:
-            if person not in points:
-                return False
-        return True
+    def is_goal(state: "State", points: list[tuple]):
+        return state.person in points
