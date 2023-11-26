@@ -14,7 +14,7 @@ class Consts:
     PERSON_IMAGE = './images/robot.png'
     X_IMAGE = './images/x.png'
     MARK_IMAGE = './images/mark.png'
-
+    
     # Times
-    STEP_TIME = 0.4
+    STEP_TIME = 0.4 
     FPS = 30

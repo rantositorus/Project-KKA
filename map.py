@@ -20,6 +20,9 @@ class Map:
     
     def set_points(self, points):
         self.points = points
+        
+    def set_levers(self, levers):
+        self.levers = levers
 
     def get_item(self, y, x) -> str:
         return self.map[y][x]
